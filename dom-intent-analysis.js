@@ -1,5 +1,18 @@
 async function analyzePageDOMForIntent() {
-  const available = await LanguageModel.availability();
+  let available;
+  try {
+    available = await LanguageModel.availability();
+  } catch (error) {
+    if (error instanceof ReferenceError) {
+      console.error("LanguageModel APIが定義されていません。");
+      console.log("chrome://flags から 'Prompt API for Gemini Nano with Multimodal Input' を有効化してください。");
+      console.log("設定変更後、ブラウザを再起動する必要があります。");
+    } else {
+      console.error("LanguageModel APIエラー:", error);
+    }
+    return;
+  }
+
   if (available === 'unavailable') {
     console.log("Built-in AIモデルが利用できません。デバイスの要件やダウンロード状況を確認してください。");
     return;

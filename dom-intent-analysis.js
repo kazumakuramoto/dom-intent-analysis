@@ -7,8 +7,20 @@ async function analyzePageDOMForIntent() {
 
   let session;
   try {
-    session = await LanguageModel.create();
-    console.log("LanguageModelセッションを作成しました。");
+    if (available === 'downloadable') {
+      console.log("AIモデルをダウンロード中...");
+      session = await LanguageModel.create({
+        monitor(m) {
+          m.addEventListener("downloadprogress", (e) => {
+            console.log(`Downloaded ${e.loaded * 100}%`);
+          });
+        },
+      });
+      console.log("ダウンロード完了。LanguageModelセッションを作成しました。");
+    } else {
+      session = await LanguageModel.create();
+      console.log("LanguageModelセッションを作成しました。");
+    }
   } catch (error) {
     console.error("セッション作成エラー:", error);
     return;
